@@ -13,6 +13,11 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
+    # Esto es parte de la configuracion de djoser
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+    path('auth/', include('djoser.social.urls')),
+    
     # Viculamos las urls de blog y category
     path('api/blog/', include('apps.blog.urls')), # esto se vera asi http://dominio.com/api/blog
     path('api/category/', include('apps.category.urls')),

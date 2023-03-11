@@ -2,7 +2,8 @@
 configuraciones de mi sitio
 
 """
-
+# Esto es para el tiempo en JWT
+from datetime import timedelta
 from pathlib import Path
 import os # os nos permite acceder a los archivos del servidor
 import environ # nos permite configurar las variables de ambiente
@@ -49,8 +50,12 @@ PROJECT_APPS = [
 THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework',
+    'djoser',
+    'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
 ]
 
 # Aqui vamos a convinar las tres anteriores en una sola
@@ -131,7 +136,14 @@ DATABASES = {
     }
 }
 
-
+# Esto es lo que hicimos con argon
+PASSWORD_HASHERS = [
+    # Esto es para hacer las contraseñas mas seguras
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -192,6 +204,64 @@ REST_FRAMEWORK = {
     ]
 }
 
+#Simple JWT
+# Configuracion del token de autenticacion
+SIMPLE_JWT = {
+    # Nombre del token (aveces se llama BEARER)
+    'AUTH_HEADER_TYPES': ('JWT', ),
+    # Tiempo de duracion de nuestro token de autenticacion antes de ser refrescado
+    # lo definimos en minutos (7 dias en este caso)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10080),
+    # Este de aqui refresca el access token una vez terminado su tiempo
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESFH_TOKENS':True,
+    # Una vez creado un token este es agregado a una lista negra para que nunca mas sea
+    # creado de nuevo
+    'BLACKLIST_AFTER_ROTATION': True,
+    # Lo que vamos a utilizar
+    'AUTH_TOKEN_CLASSES': (
+        'rest_framework_simplejwt.tokens.AccessToken',
+    )
+}
+
+# Esto hace parte de la configuracion de djoser
+DJOSER = {
+    # Login por correo
+    'LOGIN_FIELD': 'email',
+    # Esto es para para poner la contraseña dos veces
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    # Cuando cambias el usuario o la contraseña pedir confirmacion
+    # por medio del correo
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    # Envio de correo de confirmacion cuando nos estamos registrando
+    'SEND_CONFIRMATION_EMAIL': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    # Cuando estamos configurando el usuario y la contraseña
+    'SET_USERNAME_RETYPE': True,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    # Url para confirmar el reseteo (cambio del usuario o la contraseña)
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    # Url de activacion (para activar el usuario)
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    # Esto es para poder hacer login socialmente
+    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    # Esto lo vamos a usar cuando hagamos autenticacion social
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://127.0.0.1:8000/google', 'http://127.0.0.1:8000/facebook'],
+    # Aqui configuramos los serializadores del usuario
+    #  'SERIALIZERS': {
+    #     'user_create': 'apps.user.serializers.UserSerializer',
+    #     'user': 'apps.user.serializers.UserSerializer',
+    #     'current_user': 'apps.user.serializers.UserSerializer',
+    #     'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    # },
+}
+
+# AUTH_USER_MODEL = 'user.UserAccount'
+
 # Configuracion de los llamados y indicamos quien puede usar nuestro sitio
 
 # Con esto decimos que react puede acceder a esta informacion
@@ -202,6 +272,7 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS_DEV')
 # Email (este es para cuando estamos en la etapa de construccion)
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 # Con esto indicamos que cuando estemos en modo despliegue use esos dominios en caso contrario todos los dominios
 # Y tambien cambiamos de motor de base de datos, los dominios...
