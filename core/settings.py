@@ -43,6 +43,7 @@ PROJECT_APPS = [
 
     'apps.blog',
     'apps.category',
+    'apps.user',
 ]
 
 # Este va a contener nuestros paquetes de requirements.txt
@@ -251,16 +252,17 @@ DJOSER = {
     'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
     # Esto lo vamos a usar cuando hagamos autenticacion social
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://127.0.0.1:8000/google', 'http://127.0.0.1:8000/facebook'],
-    # Aqui configuramos los serializadores del usuario
-    #  'SERIALIZERS': {
-    #     'user_create': 'apps.user.serializers.UserSerializer',
-    #     'user': 'apps.user.serializers.UserSerializer',
-    #     'current_user': 'apps.user.serializers.UserSerializer',
-    #     'user_delete': 'djoser.serializers.UserDeleteSerializer',
-    # },
+    # Aqui configuramos los serializadores del usuario (lo tenemos en user)
+     'SERIALIZERS': {
+        'user_create': 'apps.user.serializers.UserSerializer',
+        'user': 'apps.user.serializers.UserSerializer',
+        'current_user': 'apps.user.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },
 }
 
-# AUTH_USER_MODEL = 'user.UserAccount'
+# Aqui estamos apuntando al modelo de user
+AUTH_USER_MODEL = 'user.UserAccount'
 
 # Configuracion de los llamados y indicamos quien puede usar nuestro sitio
 
