@@ -7,6 +7,9 @@ PyJWT (refererente tokens --> jwt)
 social-auth-app-django y social-auth-core(Esto es para hacer login con google, facebook etc)
 
 
+Nota: Siempre que agregamos un nuevo modelo de usuario tenemos que reacer la base de datos (este modelo se hace al inicio del proyecto 
+	django) ya que la base de datos puede fallar
+
 1. Migramos el proyecto de b_v1 a uno nuevo.
 2. Para hacer este blog vamos a utilizar https://djoser.readthedocs.io/en/latest/ (djoser nos permite hacer autenticacion
 	con restframework django (uno de los mejores sistemas de autenticacion que hay))
@@ -22,6 +25,8 @@ social-auth-app-django y social-auth-core(Esto es para hacer login con google, f
 	continuar con lo que ibamos a hacer)
 
 	(y asi no tenemos que hacer autenticacion cada vez que cerramos la pantalla o el sitio)
+
+	(Configuramos en core)
 
 4. 
 5. 
