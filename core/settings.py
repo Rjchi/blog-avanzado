@@ -13,6 +13,8 @@ environ.Env.read_env() # Con esto activamos environ para que lea settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent # Esto apunta a la carpeta base del proyecto (blog_personal)
 
+# Asi cuando hagamos algun envio de djoser internamente lo cambia por lo que tengamos aqui
+DOMAIN = os.environ.get('DOMAIN')
 
 # Con esto protegemos la clave secreta
 # pidiendola al archivo .env
