@@ -2,15 +2,20 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
-
+# Esto es para es para poner el texto asi hola-esto-es-un...
+from slugify import slugify
 from apps.category.models import Category
 
 from .serializers import PostSerializer, PostListSerializer
 from .models import ViewCount, Post
 
 from .pagination import SmallSetPagination, MediumSetPagination, LargeSetPagination
+from .permissions import IsPostAuthorOrReadOnly
 
 from django.db.models.query_utils import Q
+
+# Esto es para poder trabajar con imagenes
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class BlogListView(APIView):
@@ -120,3 +125,44 @@ class SearchBlogView(APIView):
 
         serializer = PostListSerializer(results, many=True)
         return paginator.get_paginated_response({'filtered_posts': serializer.data})
+
+class AuthorBlogListView(APIView):
+    # Tines que estar autenticado
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, format=None):
+        user = self.request.user
+        if Post.post_objects.filter(author = user).exists():
+            # Posts de un usuario en especifico
+            posts = Post.post_objects.filter(author = user)
+
+            # Pagination:
+
+            paginator = SmallSetPagination()
+            results = paginator.paginate_queryset(posts, request)
+
+            # Many porque van a ser una lista de posts
+            serializer = PostListSerializer(results, many=True)
+
+            # return Response({'Post': serializer.data}, status=status.HTTP_200_OK)
+            return paginator.get_paginated_response({'posts': serializer.data})
+        else:
+            return Response({'Error': 'Not posts found'}, status=status.HTTP_404_NOT_FOUND)
+class EditBlogPostView(APIView):
+    permission_classes = (IsPostAuthorOrReadOnly, )
+    parser_classes = [MultiPartParser, FormParser]
+
+    def put(self, request, format=None):
+        user = self.request.user
+        data = self.request.data
+        post = Post.objects.get(slug = data['slug'] )
+        if data['title']:
+            post.title = data["title"]
+            post.save()
+        if data['new_slug']:
+            post.slug = slugify(data["new_slug"])
+            post.save()
+        if data['description']:
+            post.description = data["description"]
+            post.save()
+        return Response({'success': 'Post edited'})

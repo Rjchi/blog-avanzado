@@ -203,8 +203,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         # Con esto permitimos el acceso de solo lectura a los usuarios no autenticados y
         # permiso completo a los usuarios autenticados
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ]
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 #Simple JWT
@@ -269,9 +273,17 @@ AUTH_USER_MODEL = 'user.UserAccount'
 # Configuracion de los llamados y indicamos quien puede usar nuestro sitio
 
 # Con esto decimos que react puede acceder a esta informacion
-CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST_DEV')
+# CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST_DEV')
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+]
 # Aqui determinamos que dominios pueden hacer respons - request
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS_DEV')
+# CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS_DEV')
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+]
 
 # Email (este es para cuando estamos en la etapa de construccion)
 

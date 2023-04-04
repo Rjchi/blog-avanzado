@@ -4,7 +4,11 @@ from django.utils import timezone
 from ckeditor.fields import RichTextField
 
 from apps.category.models import Category
-
+from django.conf import settings
+# Esta forma de llamar al usuario solo la vamos a utilizar cuando estemos
+# trabajando con el modelo del usuario en un modelo especifico (en este caso esta como relacion
+# foranea en el campo author)
+User = settings.AUTH_USER_MODEL
 
 def blog_thumbnail_directory(instance, filename):
     # funcion que indica el directorio en media/blog(automatico)
@@ -28,6 +32,7 @@ class Post(models.Model):
     # upload_to donde la subimos
     thumbnail = models.ImageField(
         upload_to=blog_thumbnail_directory, max_length=500)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField(max_length=255)  # Description small
     content = RichTextField()  # Texto enriquesido esto depende de la config que le dimos
     published = models.DateTimeField(default=timezone.now)

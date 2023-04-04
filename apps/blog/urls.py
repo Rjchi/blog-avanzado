@@ -7,4 +7,6 @@ urlpatterns = [
     path('by_category', ListPostsByCategoryView.as_view(), name='ListPostsByCategory'),
     path('detail/<slug>', PostDetailView.as_view(), name='PostDetail'),
     path('search', SearchBlogView.as_view(), name='SearchBlog'),
+    path('author_list', AuthorBlogListView.as_view(), name='AuthorBlogList'),
+    path('edit', EditBlogPostView.as_view(), name='EditBlogPost'),
 ]
