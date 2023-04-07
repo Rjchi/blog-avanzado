@@ -157,12 +157,25 @@ class EditBlogPostView(APIView):
         data = self.request.data
         post = Post.objects.get(slug = data['slug'] )
         if data['title']:
-            post.title = data["title"]
-            post.save()
+            if not data['title'] == 'undefined':
+                post.title = data["title"]
+                post.save()
         if data['new_slug']:
-            post.slug = slugify(data["new_slug"])
-            post.save()
+            if not data['new_slug'] == 'undefined':
+                post.slug = slugify(data["new_slug"])
+                post.save()
         if data['description']:
-            post.description = data["description"]
-            post.save()
+            if not data['description'] == 'undefined':
+                post.description = data["description"]
+                post.save()
+        if data['content']:
+            if not data['content'] == 'undefined' or data['content'] == False:
+                post.content = data["content"]
+                post.save()
+        if data['category']:
+            if not data['category'] == 'undefined':
+                category_id = int(data['category'])
+                category = Category.objects.get(id = category_id)
+                post.category = category
+                post.save()
         return Response({'success': 'Post edited'})
