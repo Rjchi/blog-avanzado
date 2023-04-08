@@ -83,8 +83,8 @@ class PostDetailView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, slug, format=None):
-        if Post.post_objects.filter(slug=slug).exists():
-            post = Post.post_objects.get(slug=slug)
+        if Post.objects.filter(slug=slug).exists():
+            post = Post.objects.get(slug=slug)
             # Aqui como solo toma un resultado no le decimos many=True
             serializer = PostSerializer(post)
 
@@ -126,15 +126,16 @@ class SearchBlogView(APIView):
         serializer = PostListSerializer(results, many=True)
         return paginator.get_paginated_response({'filtered_posts': serializer.data})
 
+
 class AuthorBlogListView(APIView):
     # Tines que estar autenticado
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, format=None):
         user = self.request.user
-        if Post.post_objects.filter(author = user).exists():
+        if Post.objects.filter(author=user).exists():
             # Posts de un usuario en especifico
-            posts = Post.post_objects.filter(author = user)
+            posts = Post.objects.filter(author=user)
 
             # Pagination:
 
@@ -148,6 +149,8 @@ class AuthorBlogListView(APIView):
             return paginator.get_paginated_response({'posts': serializer.data})
         else:
             return Response({'Error': 'Not posts found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class EditBlogPostView(APIView):
     permission_classes = (IsPostAuthorOrReadOnly, )
     parser_classes = [MultiPartParser, FormParser]
@@ -155,7 +158,7 @@ class EditBlogPostView(APIView):
     def put(self, request, format=None):
         user = self.request.user
         data = self.request.data
-        post = Post.objects.get(slug = data['slug'] )
+        post = Post.objects.get(slug=data['slug'])
         if data['title']:
             if not data['title'] == 'undefined':
                 post.title = data["title"]
@@ -175,7 +178,46 @@ class EditBlogPostView(APIView):
         if data['category']:
             if not data['category'] == 'undefined':
                 category_id = int(data['category'])
-                category = Category.objects.get(id = category_id)
+                category = Category.objects.get(id=category_id)
                 post.category = category
                 post.save()
+        if data['thumbnail']:
+            if not data['thumbnail'] == 'undefined':
+                post.thumbnail = data['thumbnail']
+                post.save()
+        return Response({'success': 'Post edited'})
+
+
+class DraftBlogPostView(APIView):
+    permission_classes = (IsPostAuthorOrReadOnly, )
+
+    def put(self, request, format=None):
+        data = self.request.data
+        post = Post.objects.get(slug=data['slug'])
+
+        post.status = 'draft'
+        post.save()
+        return Response({'success': 'Post edited'})
+
+
+class PublishBlogPostView(APIView):
+    permission_classes = (IsPostAuthorOrReadOnly, )
+
+    def put(self, request, format=None):
+        data = self.request.data
+        post = Post.objects.get(slug=data['slug'])
+
+        post.status = 'published'
+        post.save()
+        return Response({'success': 'Post edited'})
+
+
+class DeleteBlogPostView(APIView):
+    permission_classes = (IsPostAuthorOrReadOnly, )
+
+    def delete(self, request, slug, format=None):
+        post = Post.objects.get(slug=slug)
+
+        post.delete()
+
         return Response({'success': 'Post edited'})
