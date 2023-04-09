@@ -36,7 +36,7 @@ const BlogCardHorizontal = ({ data, index }) => {
                 id={`title` + data.id}
                 className="lg:mt-0 lg:absolute lg:top-4 leading-7 text-2xl pb-4 font-semibold text-gray-900 leading-5 transition duration-300 ease-in-out"
               >
-                {data.title.length > 100 ? data.tile.slice(0, 99) : data.title}
+                {data.title.length > 100 ? data.title.slice(0, 99) : data.title}
               </p>
               <div className="lg:absolute lg:top-15">
                 <spam className="hover:text-purple-800 mt-1 font-medium text-sm">

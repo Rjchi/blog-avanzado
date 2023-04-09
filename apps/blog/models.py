@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from ckeditor.fields import RichTextField
+import uuid
 
 from apps.category.models import Category
 from django.conf import settings
@@ -27,23 +28,23 @@ class Post(models.Model):
         ('published', 'Published'),
     ]
 
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, default=uuid.uuid4)
     # upload_to donde la subimos
     thumbnail = models.ImageField(
-        upload_to=blog_thumbnail_directory, max_length=500)
+        upload_to=blog_thumbnail_directory, max_length=500, blank=True, null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    description = models.TextField(max_length=255)  # Description small
-    content = RichTextField()  # Texto enriquesido esto depende de la config que le dimos
+    description = models.TextField(max_length=255, blank=True, null=True)  # Description small
+    content = RichTextField(blank=True, null=True)  # Texto enriquesido esto depende de la config que le dimos
     published = models.DateTimeField(default=timezone.now)
     views = models.IntegerField(default=0, blank=True)
     status = models.CharField(max_length=10, choices=options, default='draft')
     objects = models.Manager()  # Default manager
     post_objects = PostObjects()
-    time_red = models.IntegerField()
+    time_red = models.IntegerField(blank=True, null=True)
 
     # Si se borra la categoría el post no y <<vs>>
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         ordering = ('-published', )  # Con esto tomamos el mas nuevo

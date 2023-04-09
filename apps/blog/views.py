@@ -10,7 +10,7 @@ from .serializers import PostSerializer, PostListSerializer
 from .models import ViewCount, Post
 
 from .pagination import SmallSetPagination, MediumSetPagination, LargeSetPagination
-from .permissions import IsPostAuthorOrReadOnly
+from .permissions import IsPostAuthorOrReadOnly, AuthorPermission
 
 from django.db.models.query_utils import Q
 
@@ -175,6 +175,10 @@ class EditBlogPostView(APIView):
             if not data['content'] == 'undefined' or data['content'] == False:
                 post.content = data["content"]
                 post.save()
+        if data['time_red']:
+            if not data['time_red'] == 'undefined':
+                post.time_red = data["time_red"]
+                post.save()
         if data['category']:
             if not data['category'] == 'undefined':
                 category_id = int(data['category'])
@@ -219,5 +223,15 @@ class DeleteBlogPostView(APIView):
         post = Post.objects.get(slug=slug)
 
         post.delete()
+
+        return Response({'success': 'Post edited'})
+
+
+class CreateBlogPostView(APIView):
+    permission_classes = (AuthorPermission, )
+
+    def post(self, request, format=None):
+        user = self.request.user
+        Post.objects.create(author=user)
 
         return Response({'success': 'Post edited'})
